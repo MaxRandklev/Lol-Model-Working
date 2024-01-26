@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculation Results</title>
+</head>
+<body>
+    <h1>Results</h1>
+    {% if results %}
+        <p>Average kills of player '{{ player_name }}' against team '{{ team_name }}': {{ results[0][0] }}, over {{ results[0][1] }} games.</p>
+    {% else %}
+        <p>No matching data found for the query.</p>
+    {% endif %}
+    <a href="/">Back to form</a>
+</body>
+</html>

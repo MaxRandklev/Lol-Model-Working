@@ -2,6 +2,13 @@ import tkinter as tk
 from tkinter import scrolledtext, messagebox, Tk, Label, Button
 import pandas as pd
 from difflib import get_close_matches
+from flask import Flask, request, render_template
+
+app = Flask(__name__)
+
+# ... [Include your functions: average_kills_against_teams, suggest_player_correction, suggest_team_correction, read_and_concatenate_files here] ...
+
+
 
 def average_kills_against_teams(data, player_name, teams, results_text):
     player_name_lower = player_name.lower()
@@ -117,4 +124,24 @@ def calculate_and_show_results():
 calculate_button=tk.Button(root,text="Calculate AVG Kills", command=calculate_and_show_results)
 calculate_button.pack()
 
-root.mainloop()
+(root.mainloop()
+
+ @app.route('/'))
+def index():
+    return render_template('index.html')
+
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    player_name = request.form['player_name']
+    team_name = request.form['team_name']
+    teams = [team_name]
+
+    # Load your CSV data here, for the example I'm using a placeholder
+    # concatenated_data = read_and_concatenate_files(...)
+    concatenated_data = pd.DataFrame()  # Placeholder, replace with your actual data loading logic
+
+    results = average_kills_against_teams(concatenated_data, player_name, teams)
+    return render_template('result.html', results=results, player_name=player_name, team_name=team_name)
+
+if __name__ == '__main__':
+    app.run(debug=True)
