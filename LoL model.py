@@ -136,9 +136,12 @@ def calculate():
     team_name = request.form['team_name']
     teams = [team_name]
 
-    # Load your CSV data here, for the example I'm using a placeholder
-    # concatenated_data = read_and_concatenate_files(...)
-    concatenated_data = pd.DataFrame()  # Placeholder, replace with your actual data loading logic
+    concatenated_data = read_and_concatenate_files
+    {"2024": '2024_LoL_esports_match_data_from_OraclesElixir.csv',
+     "2023": "2023_LoL_esports_match_data_from_OraclesElixir.csv",
+     "2022": '2022_LoL_esports_match_data_from_OraclesElixir.csv',
+     "2021": '2021_LoL_esports_match_data_from_OraclesElixir.csv',
+     "2020": '2020_LoL_esports_match_data_from_OraclesElixir.csv'}
 
     results = average_kills_against_teams(concatenated_data, player_name, teams)
     return render_template('result.html', results=results, player_name=player_name, team_name=team_name)
