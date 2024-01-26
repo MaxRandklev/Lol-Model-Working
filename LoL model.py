@@ -126,25 +126,28 @@ calculate_button.pack()
 
 (root.mainloop()
 
- @app.route('/'))
+ @ app.route('/', methods=['GET', 'POST'])
+
+
 def index():
-    return render_template('index.html')
+    results = None
+    player_name = ""
+    team_name = ""
 
-@app.route('/calculate', methods=['POST'])
-def calculate():
-    player_name = request.form['player_name']
-    team_name = request.form['team_name']
-    teams = [team_name]
+    if request.method == 'POST':
+        player_name = request.form['player_name']
+        team_name = request.form['team_name']
+        teams = [team_name]
 
-    concatenated_data = read_and_concatenate_files
-    {"2024": '2024_LoL_esports_match_data_from_OraclesElixir.csv',
-     "2023": "2023_LoL_esports_match_data_from_OraclesElixir.csv",
-     "2022": '2022_LoL_esports_match_data_from_OraclesElixir.csv',
-     "2021": '2021_LoL_esports_match_data_from_OraclesElixir.csv',
-     "2020": '2020_LoL_esports_match_data_from_OraclesElixir.csv'}
+        # Modify this to load files appropriately for a web environment
+        concatenated_data = read_and_concatenate_files({
+            # Your file paths here
+        })
 
-    results = average_kills_against_teams(concatenated_data, player_name, teams)
-    return render_template('result.html', results=results, player_name=player_name, team_name=team_name)
+        results = average_kills_against_teams(concatenated_data, player_name, teams)
+
+    return render_template('index.html', results=results, player_name=player_name, team_name=team_name)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
