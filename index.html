@@ -4,13 +4,23 @@
     <title>LoL Average Kills Calculator</title>
 </head>
 <body>
-    <h1>Enter Player and Team Details</h1>
-    <form action="/calculate" method="post">
+    <h1>LoL Average Kills Calculator</h1>
+    <form action="/" method="post">
         <label for="player_name">Player Name:</label><br>
-        <input type="text" id="player_name" name="player_name"><br>
+        <input type="text" id="player_name" name="player_name" value="{{ player_name }}" required><br><br>
         <label for="team_name">Team Name:</label><br>
-        <input type="text" id="team_name" name="team_name"><br><br>
+        <input type="text" id="team_name" name="team_name" value="{{ team_name }}" required><br><br>
         <input type="submit" value="Calculate">
     </form>
+
+    {% if results %}
+        <h2>Results</h2>
+        <p>Results for {{ player_name }} against {{ team_name }}:</p>
+        {% for team, (avg_kills, game_count) in results.items() %}
+            <p>Average kills: {{ avg_kills }}, in {{ game_count }} games.</p>
+        {% endfor %}
+    {% elif request.method == 'POST' %}
+        <p>No results found.</p>
+    {% endif %}
 </body>
 </html>
