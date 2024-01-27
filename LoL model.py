@@ -1,11 +1,8 @@
-import tkinter as tk
-from tkinter import scrolledtext, messagebox, Tk, Label, Button
 import pandas as pd
 from difflib import get_close_matches
+from flask import Flask, request, render_template
 
-# ... [Include your functions: average_kills_against_teams, suggest_player_correction, suggest_team_correction, read_and_concatenate_files here] ...
-
-
+app=Flask(__name__)
 
 def average_kills_against_teams(data, player_name, teams, results_text):
     player_name_lower = player_name.lower()
@@ -15,7 +12,6 @@ def average_kills_against_teams(data, player_name, teams, results_text):
     # Check if player data is found
     if player_data.empty:
         suggest_player_correction(data, player_name_lower, results_text)
-        results_text.insert(tk.END, f"Player '{player_name}' not found in data.\n")
         return {}
 
     results = {}
@@ -38,7 +34,6 @@ def average_kills_against_teams(data, player_name, teams, results_text):
         results[team_lower] = (avg_kills, game_count)
         if not team_found:
             suggest_team_correction(data, team_lower, results_text)
-            results_text.insert(tk.END, f"Team '{team_lower}' not found in games for player '{player_name}'.\n")
 
     return results
 
@@ -48,7 +43,6 @@ def suggest_player_correction(data, player_name, results_text):
     suggestions = get_close_matches(player_name, all_players, n=3, cutoff=0.6)
     if suggestions:
         suggestion_msg = f"No data found for '{player_name}'. Did you mean: {', '.join(suggestions)}?\n"
-        results_text.insert(tk.END, suggestion_msg)
 
 def suggest_team_correction(data, team, results_text):
     # Convert all team names to strings and to lowercase
@@ -60,7 +54,6 @@ def suggest_team_correction(data, team, results_text):
     suggestions = get_close_matches(team_str, all_teams, n=3, cutoff=0.6)
     if suggestions:
         suggestion_msg = f"No data found for '{team_str}'. Did you mean: {', '.join(suggestions)}?\n"
-        results_text.insert(tk.END, suggestion_msg)
 
 def read_and_concatenate_files(selected_files):
     dataframes=[pd.read_csv(filepath, low_memory=False) for filepath, var in selected_files.items() if var.get()]
@@ -69,56 +62,3 @@ def read_and_concatenate_files(selected_files):
         return pd.DataFrame()
 
     return pd.concat(dataframes, ignore_index=True)
-
-root=tk.Tk()
-root.title("LoL Average Kills Calculator")
-
-file_paths={"2024":'2024_LoL_esports_match_data_from_OraclesElixir.csv',"2023":"2023_LoL_esports_match_data_from_OraclesElixir.csv","2022":'2022_LoL_esports_match_data_from_OraclesElixir.csv',"2021":'2021_LoL_esports_match_data_from_OraclesElixir.csv',"2020":'2020_LoL_esports_match_data_from_OraclesElixir.csv'}
-
-file_selection={}
-for file_name, file_path in file_paths.items():
-    file_selection[file_path]=tk.BooleanVar(value=False)
-    checkbox = tk.Checkbutton(root, text=file_name, variable=file_selection[file_path])
-    checkbox.pack()
-
-player_name_label=tk.Label(root,text="Player Name:")
-player_name_label.pack()
-player_name_entry=tk.Entry(root)
-player_name_entry.pack()
-
-team_name_label=tk.Label(root,text="Team Name:")
-team_name_label.pack()
-team_name_entry=tk.Entry()
-team_name_entry.pack()
-
-results_text = tk.Text(root, height=10, width=50, wrap=tk.WORD)
-results_text.pack()
-
-
-def calculate_and_show_results():
-    player_name = player_name_entry.get()
-    team_name = team_name_entry.get()
-    teams = [team_name]
-
-    concatenated_data = read_and_concatenate_files(file_selection)
-
-    results_text.config(state=tk.NORMAL)  # Enable editing to insert text
-    results_text.delete('1.0', tk.END)  # Clear previous results
-
-    if concatenated_data.empty:
-        results_text.insert(tk.END, "No data, ensure a year was selected.\n")
-    else:
-        average_kills_result = average_kills_against_teams(concatenated_data, player_name, teams, results_text)
-        for team, (avg_kills, game_count) in average_kills_result.items():
-            results_string = f"Average kills of player '{player_name}' against team '{team}': {avg_kills}, over {game_count} games.\n"
-            results_text.insert(tk.END, results_string)
-
-    if not average_kills_result:  # Check if the result is empty
-        results_text.insert(tk.END, "No matching data found for the query.\n")
-
-    results_text.config(state=tk.DISABLED)  # Disable editing after insertion
-
-calculate_button=tk.Button(root,text="Calculate AVG Kills", command=calculate_and_show_results)
-calculate_button.pack()
-
-root.mainloop()
